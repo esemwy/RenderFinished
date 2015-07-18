@@ -1,0 +1,91 @@
+// DAZ Studio version 4.5.1.6 filetype DAZ Script
+var programName = "RenderFinished";
+var versionName = "0.01";
+var appName = "com.smy.RenderFinished";
+
+var info = DzFileInfo(getScriptFileName());
+var sFileName = getSetting("audioFile", info.path()+"/renderfinished.wav");
+
+//set dialog
+var wDlg = new DzDialog;
+wDlg.caption = programName + " " + versionName;
+
+var gb = new DzVGroupBox( wDlg );
+var gbBrowse = new DzVGroupBox( gb );
+gbBrowse.columns = 3;
+var wLblDest = new DzLabel( gbBrowse );
+wLblDest.text = "Audio File:";
+var wEdDest = new DzLineEdit( gbBrowse );
+wEdDest.text = sFileName;
+wEdDest.readOnly = true;
+var wBrowseBtn = addButtonToGB( gbBrowse, "Browse ...", BrowseFile );
+
+var gbButtons = new DzVGroupBox( gb );
+gbButtons.columns = 2;
+
+var wOkBtn = addButtonToGB( gbButtons, "OK", createRenderCallBack );
+wDlg.setAcceptButton(wOkBtn);
+
+var wCancelBtn = new DzPushButton( gbButtons );
+wCancelBtn.text = "&Cancel";
+wDlg.setRejectButton( wCancelBtn );
+
+wDlg.minWidth = 300;
+wDlg.minHeight = 150;
+
+wDlg.exec();
+
+
+function createRenderCallBack() {
+
+    var sAudioFileName = getSetting("audioFile", sFileName);
+    var renderFinishedScript =  "var oSound;\n" +
+                                "var nPlatform = App.platform();\n" +
+                                "if ( nPlatform == App.Windows )\n" +
+                                "    oSound = new DzWinAudioClip;\n" +
+                                "else if( nPlatform == App.MacOSX )\n" +
+                                "    oSound = new DzMacAudioClip;\n" +
+                                "oSound.openFile('"+sAudioFileName+"');\n" +
+                                "oSound.play();\n";
+
+    var cbm = App.getCallBackMgr();
+    var oRenderMgr = App.getRenderMgr();
+    cbm.deleteCallBack('com.smy.renderfinished');
+    var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, true);
+    cb.setConnection(oRenderMgr, 'renderFinished(bool)');
+    print("added callback:\n"+renderFinishedScript);
+}
+
+function addButtonToGB( gb, text, func )
+{
+    var wButton = new DzPushButton( gb );
+    wButton.text = text;
+    connect( wButton, "clicked()", func );
+    return( wButton );
+}
+
+function BrowseFile()
+{
+    var path = FileDialog.doAudioClipOpenDialog( wEdDest.text, wDlg );
+    if( path ) {
+        wEdDest.text = path;
+        saveSetting("audioFile", path);
+    }
+}
+
+function saveSetting( key, keyVal )
+{
+    var m_oMgr = App.getAppSettingsMgr();
+    m_oMgr.pushPath( appName );
+    m_oMgr.setStringValue( key, keyVal );
+    m_oMgr.popPath();
+}
+
+function getSetting( key, defVal )
+{
+    var m_oMgr = App.getAppSettingsMgr();
+    m_oMgr.pushPath( appName );
+    var val = m_oMgr.getStringValue( key, defVal );
+    m_oMgr.popPath();
+    return ( val );
+}
