@@ -1,10 +1,11 @@
 // DAZ Studio version 4.5.1.6 filetype DAZ Script
 var programName = "RenderFinished";
 var versionName = "0.01";
-var appName = "com.smy.RenderFinished";
+var appName = "esemwy_RenderFinished";
 
 var info = DzFileInfo(getScriptFileName());
 var sFileName = getSetting("audioFile", info.path()+"/renderfinished.wav");
+var renderFinishedScript = info.path()+"/renderFinishedScript.js";
 
 //set dialog
 var wDlg = new DzDialog;
@@ -20,6 +21,24 @@ wEdDest.text = sFileName;
 wEdDest.readOnly = true;
 var wBrowseBtn = addButtonToGB( gbBrowse, "Browse ...", BrowseFile );
 
+
+var gbNotifyOpts = new DzVGroupBox( gb );
+gbNotifyOpts.columns = 2;
+
+var wCkGrowl = new DzCheckBox( gbNotifyOpts );
+wCkGrowl.text = "Growl Notify";
+wCkGrowl.checked = DzAppSettings(appName).getBoolValue("doGrowl");
+connect(wCkGrowl, "toggled(bool)", function(on) {
+    DzAppSettings(appName).setBoolValue("doGrowl", on);
+} );
+
+var wCkAudio = new DzCheckBox( gbNotifyOpts );
+wCkAudio.text = "Audio Notify";
+wCkAudio.checked = DzAppSettings(appName).getBoolValue("doAudio");
+connect(wCkAudio, "toggled(bool)", function(on) {
+    DzAppSettings(appName).setBoolValue("doAudio", on);
+} );
+    
 var gbButtons = new DzVGroupBox( gb );
 gbButtons.columns = 2;
 
@@ -36,22 +55,20 @@ wDlg.minHeight = 150;
 wDlg.exec();
 
 
-function createRenderCallBack() {
-
-    var sAudioFileName = getSetting("audioFile", sFileName);
-    var renderFinishedScript =  "var oSound;\n" +
-                                "var nPlatform = App.platform();\n" +
-                                "if ( nPlatform == App.Windows )\n" +
-                                "    oSound = new DzWinAudioClip;\n" +
-                                "else if( nPlatform == App.MacOSX )\n" +
-                                "    oSound = new DzMacAudioClip;\n" +
-                                "oSound.openFile('"+sAudioFileName+"');\n" +
-                                "oSound.play();\n";
+function createRenderCallBack()
+{
+//     var oScript = new DzScript;
+//     oScript.loadFromFile( renderFinishedScript );
+//     var sScript = oScript.getCode();
+    var oJSFile = DzFile( renderFinishedScript );
+    oJSFile.open( DzFile.ReadOnly );
+    sScript = oJSFile.read();
+    oJSFile.close();
 
     var cbm = App.getCallBackMgr();
     var oRenderMgr = App.getRenderMgr();
     cbm.deleteCallBack('com.smy.renderfinished');
-    var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, true);
+    var cb = cbm.createCallBack('com.smy.renderfinished', sScript, true);
     cb.setConnection(oRenderMgr, 'renderFinished(bool)');
     print("added callback:\n"+renderFinishedScript);
 }
