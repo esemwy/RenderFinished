@@ -4,7 +4,7 @@ var versionName = "0.01";
 var appName = "esemwy_RenderFinished";
 
 var info = DzFileInfo(getScriptFileName());
-var sFileName = getSetting("audioFile", info.path()+"/renderfinished.wav");
+var sFileName = getSetting("audioFile", "");
 var g_execGrowl = "/usr/local/bin/growlnotify"
 function notifySound()
 {
