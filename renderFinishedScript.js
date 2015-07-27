@@ -3,14 +3,15 @@ var programName = "RenderFinished";
 var versionName = "0.01";
 var appName = "esemwy_RenderFinished";
 
+var nPlatform = App.platform();
 var info = DzFileInfo(getScriptFileName());
 var sFileName = getSetting("audioFile", "");
-var g_execGrowl = "/usr/local/bin/growlnotify"
+var g_execGrowl = getSetting("growlNotify", "")
+
 function notifySound()
 {
     var sAudioFileName = getSetting("audioFile", sFileName);
     var oSound;
-    var nPlatform = App.platform();
     if ( nPlatform == App.Windows )
         oSound = new DzWinAudioClip;
     else if( nPlatform == App.MacOSX )
@@ -30,9 +31,16 @@ function notifyGrowl()
     connect( process, "wroteToStdin()",     function() {}  ); 
     var aArgs = new Array;
     aArgs.push( g_execGrowl );
-    aArgs.push( "--name=DAZStudio" );
-    aArgs.push( "--message=DAZ Studio has finished rendering" );
-    aArgs.push( "Render finished" );
+    if ( nPlatform == App.Windows ) {
+        aArgs.push( "/t:Render finished" );
+        aArgs.push( "DAZ Studio has finished rendering" );
+    }
+    else if ( nPlatform == App.MacOSX ) {
+        aArgs.push( "--name=DAZStudio" );
+        aArgs.push( "--message=DAZ Studio has finished rendering" );
+        aArgs.push( "Render finished" );
+    }
+
     process.arguments = aArgs;
     //this process expects the name of the client in stdin
     var clientName = "Daz Studio\n";

@@ -6,6 +6,9 @@ var appName = "esemwy_RenderFinished";
 
 var info = DzFileInfo(getScriptFileName());
 var sFileName = getSetting("audioFile", "");
+var sExecName = getSetting("growlNotify", "")
+var nPlatform = App.platform();
+
 var renderFinishedScript = info.path()+"/renderFinishedScript.js";
 
 //set dialog
@@ -13,6 +16,16 @@ var wDlg = new DzDialog;
 wDlg.caption = programName + " " + versionName;
 
 var gb = new DzVGroupBox( wDlg );
+
+var gbExec = new DzVGroupBox( gb );
+gbExec.columns = 3;
+var wLblExec = new DzLabel( gbExec );
+wLblExec.text = "growlnotify Location:";
+var wEdExec = new DzLineEdit( gbExec );
+wEdExec.text = sExecName;
+wEdExec.readOnly = true;
+var wBrowseBtn = addButtonToGB( gbExec, "Browse ...", BrowseExec );
+
 var gbBrowse = new DzVGroupBox( gb );
 gbBrowse.columns = 3;
 var wLblDest = new DzLabel( gbBrowse );
@@ -21,7 +34,6 @@ var wEdDest = new DzLineEdit( gbBrowse );
 wEdDest.text = sFileName;
 wEdDest.readOnly = true;
 var wBrowseBtn = addButtonToGB( gbBrowse, "Browse ...", BrowseFile );
-
 
 var gbNotifyOpts = new DzVGroupBox( gb );
 gbNotifyOpts.columns = 2;
@@ -50,8 +62,8 @@ var wCancelBtn = new DzPushButton( gbButtons );
 wCancelBtn.text = "&Cancel";
 wDlg.setRejectButton( wCancelBtn );
 
-wDlg.minWidth = 300;
-wDlg.minHeight = 150;
+wDlg.minWidth = 350;
+wDlg.minHeight = 225;
 
 wDlg.exec();
 
@@ -88,6 +100,23 @@ function BrowseFile()
     if( path ) {
         wEdDest.text = path;
         saveSetting("audioFile", path);
+    }
+}
+
+function BrowseExec()
+{
+    var path;
+    if (nPlatform == App.Windows ) {
+        var dir = FileDialog.doDirectoryDialog( "Locate growlnotify directory", "", "C:/" );
+        path = "%1/%2".arg( dir ).arg( "growlnotify.exe" );
+    }
+    else if ( nPlatform == App.MacOSX ) {
+        var dir = FileDialog.doDirectoryDialog( "Locate growlnotify directory", "", "/usr/local/bin" );
+        path = "%1/%2".arg( dir ).arg( "growlnotify" );
+    }
+    if( path && DzFileInfo(path).exists() ) {
+        wEdExec.text = path;
+        saveSetting("growlNotify", path);
     }
 }
 
