@@ -1,3 +1,4 @@
+// Released under GPLv2
 var programName = "RenderFinished";
 var versionName = "0.01";
 var appName = "esemwy_RenderFinished";
