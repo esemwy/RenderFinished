@@ -9,7 +9,7 @@ var sFileName = getSetting("audioFile", "");
 var sExecName = getSetting("growlNotify", "")
 var nPlatform = App.platform();
 
-var renderFinishedScript = info.path()+"/renderFinishedScript.js";
+var renderFinishedScript = info.path()+"/RenderFinishedScript.dsa";
 
 //set dialog
 var wDlg = new DzDialog;
@@ -70,18 +70,11 @@ wDlg.exec();
 
 function createRenderCallBack()
 {
-//     var oScript = new DzScript;
-//     oScript.loadFromFile( renderFinishedScript );
-//     var sScript = oScript.getCode();
-    var oJSFile = DzFile( renderFinishedScript );
-    oJSFile.open( DzFile.ReadOnly );
-    sScript = oJSFile.read();
-    oJSFile.close();
 
     var cbm = App.getCallBackMgr();
     var oRenderMgr = App.getRenderMgr();
     cbm.deleteCallBack('com.smy.renderfinished');
-    var cb = cbm.createCallBack('com.smy.renderfinished', sScript, true);
+    var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, false);
     cb.setConnection(oRenderMgr, 'renderFinished(bool)');
     print("added callback:\n"+renderFinishedScript);
 }
