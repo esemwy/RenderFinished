@@ -70,13 +70,13 @@ wDlg.exec();
 
 function createRenderCallBack()
 {
-
     var cbm = App.getCallBackMgr();
     var oRenderMgr = App.getRenderMgr();
     cbm.deleteCallBack('com.smy.renderfinished');
-    var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, false);
-    cb.setConnection(oRenderMgr, 'renderFinished(bool)');
-    print("added callback:\n"+renderFinishedScript);
+    if (DzAppSettings(appName).getBoolValue("doGrowl") or DzAppSettings(appName).getBoolValue("doAudio")) {
+        var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, false);
+        cb.setConnection(oRenderMgr, 'renderFinished(bool)');
+    }
 }
 
 function addButtonToGB( gb, text, func )
@@ -115,17 +115,10 @@ function BrowseExec()
 
 function saveSetting( key, keyVal )
 {
-    var m_oMgr = App.getAppSettingsMgr();
-    m_oMgr.pushPath( appName );
-    m_oMgr.setStringValue( key, keyVal );
-    m_oMgr.popPath();
+    DzAppSettings(appName).setStringValue( key, keyVal );
 }
 
 function getSetting( key, defVal )
 {
-    var m_oMgr = App.getAppSettingsMgr();
-    m_oMgr.pushPath( appName );
-    var val = m_oMgr.getStringValue( key, defVal );
-    m_oMgr.popPath();
-    return ( val );
+    return DzAppSettings(appName).getStringValue( key, defVal );
 }
