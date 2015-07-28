@@ -73,7 +73,7 @@ function createRenderCallBack()
     var cbm = App.getCallBackMgr();
     var oRenderMgr = App.getRenderMgr();
     cbm.deleteCallBack('com.smy.renderfinished');
-    if (DzAppSettings(appName).getBoolValue("doGrowl") or DzAppSettings(appName).getBoolValue("doAudio")) {
+    if (DzAppSettings(appName).getBoolValue("doGrowl") || DzAppSettings(appName).getBoolValue("doAudio")) {
         var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, false);
         cb.setConnection(oRenderMgr, 'renderFinished(bool)');
     }
