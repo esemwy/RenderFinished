@@ -30,14 +30,23 @@ function notifyGrowl()
     connect( process, "readyReadStdout()",  function() {}  );
     connect( process, "wroteToStdin()",     function() {}  ); 
     var aArgs = new Array;
+    var nNow = Date.now();
+    var nStarted = DzAppSettings(appName).getFloatValue("timerStarted", 0);
+    var sMessage;
+    if (nStarted != 0)
+        sMessage = "DAZ Studio finished rendering in%1".arg( hms(nNow - nStarted) );
+    else
+        sMessage = "DAZ Studio has finished rendering.";
+
+    print(sMessage);
     aArgs.push( g_execGrowl );
     if ( nPlatform == App.Windows ) {
         aArgs.push( "/t:Render finished" );
-        aArgs.push( "DAZ Studio has finished rendering" );
+        aArgs.push( "%1".arg( sMessage ) );
     }
     else if ( nPlatform == App.MacOSX ) {
         aArgs.push( "--name=DAZStudio" );
-        aArgs.push( "--message=DAZ Studio has finished rendering" );
+        aArgs.push( "--message=%1".arg( sMessage ) );
         aArgs.push( "Render finished" );
     }
 
@@ -46,6 +55,22 @@ function notifyGrowl()
     var clientName = "Daz Studio\n";
     if( !process.launch( clientName ) )
         MessageBox.critical( "Could not start the process.", "Fatal Error", "&OK" );
+}
+
+function hms(msec)
+{
+    var seconds = Math.floor(msec/1000);
+    var days = Math.floor(seconds/86400);
+    seconds = seconds - days*86400;
+
+    var hours = Math.floor(seconds/3600);
+    seconds = seconds - hours*3600;
+
+    var minutes = Math.floor(seconds/60);
+    seconds = seconds - minutes*60;
+
+    var sDuration = (days ? " %1 days".arg(days) : "" ) + (hours ? " %1 hours".arg(hours) : "") + (minutes ? " %1 minutes".arg(minutes) : "") + " %1 seconds".arg(seconds);
+    return sDuration;
 }
 
 function getSetting( key, defVal )

@@ -72,10 +72,14 @@ function createRenderCallBack()
 {
     var cbm = App.getCallBackMgr();
     var oRenderMgr = App.getRenderMgr();
+    cbm.deleteCallBack('com.smy.renderstarted');
     cbm.deleteCallBack('com.smy.renderfinished');
     if (DzAppSettings(appName).getBoolValue("doGrowl") || DzAppSettings(appName).getBoolValue("doAudio")) {
-        var cb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, false);
-        cb.setConnection(oRenderMgr, 'renderFinished(bool)');
+        var sStartCmd = 'DzAppSettings("'+appName+'").setFloatValue("timerStarted", Date.now());';
+        var scb = cbm.createCallBack('com.smy.renderstarted', sStartCmd, true);
+        scb.setConnection(oRenderMgr, 'renderStarting()');
+        var fcb = cbm.createCallBack('com.smy.renderfinished', renderFinishedScript, false);
+        fcb.setConnection(oRenderMgr, 'renderFinished(bool)');
     }
 }
 
